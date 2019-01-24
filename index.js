@@ -2,6 +2,20 @@ const express = require('express')
 const app = express()
 const port = 3000
 
-app.get('/', (req, res) => res.send('Hello World!'))
+const environment = process.env.NODE_ENV || 'development';
+const knexConfig = require('./knexfile')[environment];
+const db = require('knex')(knexConfig);
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+
+app.get('/', (req, res, next) => {
+    db('methods')
+    .then((rows) => {
+      res.send(rows);
+    })
+    .catch((err) => {
+      next(err);
+    });
+})
+
+app.listen(port, () => console.log(`Porty on port ${port}!`))
